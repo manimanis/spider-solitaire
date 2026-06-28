@@ -1,0 +1,87 @@
+/* ============================================
+   styles.css - Styles globaux du Spider Solitaire
+   Thème monochrome (vert sombre + accents dorés)
+   ============================================ */
+
+/* Variables CSS globales pour la taille des cartes */
+:root {
+  --card-width: 100px;
+  --card-height: 140px;
+  --card-overlap: 28px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #0d1f17;
+  transition: background 0.4s ease;
+}
+
+body.dark-theme {
+  background: #0d1f17;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Responsive : réduit la taille des cartes sur petits écrans */
+@media (max-width: 1100px) {
+  :root {
+    --card-width: 68px;
+    --card-height: 95px;
+    --card-overlap: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --card-width: 58px;
+    --card-height: 82px;
+    --card-overlap: 20px;
+  }
+}
+
+@media (max-width: 700px) {
+  :root {
+    --card-width: 48px;
+    --card-height: 68px;
+    --card-overlap: 16px;
+  }
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Empêche la sélection de texte pendant le drag */
+.card, .column, .deck__stack {
+  -webkit-user-select: none;
+  user-select: none;
+}

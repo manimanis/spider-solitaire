@@ -1,0 +1,49 @@
+# Dépendances
+node_modules/
+
+# Build
+dist/
+build/
+
+# Fichiers de l'environnement local
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE - Dossier de configuration local (non partagé)
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+.DS_Store
+
+# Cache du framework
+.temp/
+.cache/
+
+# Fichiers système
+Thumbs.db
+Desktop.ini
+
+# Vite
+*.tsbuildinfo
+
+# TypeScript (si ajouté plus tard)
+*.tsbuildinfo
+
+# ESLint / Prettier (caches)
+.eslintcache
+.stylelintcache
