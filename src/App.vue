@@ -30,16 +30,36 @@ const isDarkTheme = ref(true) // Thème sombre par défaut (plus adapté à un j
 // Afficher les stats
 const showStats = ref(false)
 
+// Support PWA Installation
+const deferredPrompt = ref(null)
+
+function onBeforeInstallPrompt(e) {
+  e.preventDefault()
+  deferredPrompt.value = e
+}
+
+async function installPWA() {
+  if (!deferredPrompt.value) return
+  deferredPrompt.value.prompt()
+  const { outcome } = await deferredPrompt.value.userChoice
+  if (outcome === 'accepted') {
+    info('📲 Application installée avec succès !')
+  }
+  deferredPrompt.value = null
+}
+
 // Initialiser une nouvelle partie au montage
 onMounted(() => {
   game.newGame()
   applyTheme()
   window.addEventListener('keydown', onKeyDown)
+  window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
 })
 
 onUnmounted(() => {
   game.stopTimer()
   window.removeEventListener('keydown', onKeyDown)
+  window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
   if (hintTimeout) clearTimeout(hintTimeout)
 })
 
@@ -212,6 +232,15 @@ game.newGame = function() {
         >
           <span class="btn__icon">💡</span>
           Indice
+        </button>
+        <button
+          v-if="deferredPrompt"
+          class="btn btn--accent"
+          @click="installPWA"
+          title="Installer l'application sur cet appareil"
+        >
+          <span class="btn__icon">📲</span>
+          Installer
         </button>
         <button class="btn btn--icon-only" @click="toggleTheme" :title="isDarkTheme ? 'Mode clair (D)' : 'Mode sombre (D)'">
           <span>{{ isDarkTheme ? '☀' : '☾' }}</span>

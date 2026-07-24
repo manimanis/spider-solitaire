@@ -116,7 +116,7 @@ function onCardDblClick(cardIndex) {
       v-for="(card, index) in cards"
       :key="card.id"
       class="column__card-wrapper"
-      :style="{ top: `${index * 28}px` }"
+      :style="{ top: `${index * 28}px`, zIndex: index + 1 }"
     >
       <Card
         :card="card"
