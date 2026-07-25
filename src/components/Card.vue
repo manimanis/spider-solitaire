@@ -14,11 +14,12 @@ const props = defineProps({
   isDraggable: { type: Boolean, default: false },
   isDragging: { type: Boolean, default: false },
   isHinted: { type: Boolean, default: false },
+  isSelected: { type: Boolean, default: false },
   columnIndex: { type: Number, required: true },
   cardIndex: { type: Number, required: true }
 })
 
-const emit = defineEmits(['drag-start', 'drag-end', 'dblclick'])
+const emit = defineEmits(['drag-start', 'drag-end', 'dblclick', 'click'])
 
 /**
  * Disposition standard des pips (♠) selon la valeur de la carte (1 à 10)
@@ -140,23 +141,24 @@ function onDblClick() {
     emit('dblclick', props.cardIndex)
   }
 }
+
+function onClick(event) {
+  if (event && typeof event.stopPropagation === 'function') {
+    event.stopPropagation()
+  }
+  emit('click', props.cardIndex)
+}
 </script>
 
 <template>
-  <div
-    class="card"
-    :class="{
-      'card--face-down': !card.faceUp,
-      'card--face-up': card.faceUp,
-      'card--draggable': isDraggable,
-      'card--dragging': isDragging,
-      'card--hinted': isHinted
-    }"
-    :draggable="isDraggable"
-    @dragstart="onDragStart"
-    @dragend="onDragEnd"
-    @dblclick="onDblClick"
-  >
+  <div class="card" :class="{
+    'card--face-down': !card.faceUp,
+    'card--face-up': card.faceUp,
+    'card--draggable': isDraggable,
+    'card--dragging': isDragging,
+    'card--hinted': isHinted,
+    'card--selected': isSelected
+  }" :draggable="isDraggable" @dragstart="onDragStart" @dragend="onDragEnd" @click="onClick" @dblclick="onDblClick">
     <!-- Face visible -->
     <template v-if="card.faceUp">
       <!-- Coin supérieur gauche -->
@@ -166,22 +168,13 @@ function onDblClick() {
       </div>
 
       <!-- Centre de la carte : Nombre de pips ♠ (1 à 10) -->
-      <div
-        v-if="card.rank >= 1 && card.rank <= 10"
-        class="card__pips"
-        :class="`card__pips--rank-${card.rank}`"
-      >
-        <span
-          v-for="(pip, i) in getPips(card.rank)"
-          :key="i"
-          class="card__pip"
-          :class="{ 'card__pip--ace': pip.isAce, 'card__pip--inverted': pip.inverted }"
-          :style="{
+      <div v-if="card.rank >= 1 && card.rank <= 10" class="card__pips" :class="`card__pips--rank-${card.rank}`">
+        <span v-for="(pip, i) in getPips(card.rank)" :key="i" class="card__pip"
+          :class="{ 'card__pip--ace': pip.isAce, 'card__pip--inverted': pip.inverted }" :style="{
             left: `${pip.x}%`,
             top: `${pip.y}%`,
             transform: `translate(-50%, -50%) ${pip.inverted ? 'rotate(180deg)' : ''}`
-          }"
-        >
+          }">
           {{ card.suit }}
         </span>
       </div>
@@ -253,11 +246,13 @@ function onDblClick() {
 .card--draggable {
   cursor: grab;
 }
+
 .card--draggable:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
   z-index: 100;
 }
+
 .card--draggable:active {
   cursor: grabbing;
 }
@@ -266,6 +261,15 @@ function onDblClick() {
 .card--dragging {
   opacity: 0.3;
   transform: scale(0.95);
+}
+
+/* Carte sélectionnée (tap-to-select) */
+.card--selected {
+  outline: 3px solid #ffd700;
+  outline-offset: -1px;
+  box-shadow: 0 0 18px rgba(255, 215, 0, 0.8), 0 6px 16px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px);
+  z-index: 150 !important;
 }
 
 /* Carte suggérée par l'indice */
@@ -277,10 +281,13 @@ function onDblClick() {
 }
 
 @keyframes hintPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 0 3px #ffd700, 0 0 12px rgba(255, 215, 0, 0.4);
     transform: translateY(0);
   }
+
   50% {
     box-shadow: 0 0 0 5px #ffd700, 0 0 24px rgba(255, 215, 0, 0.8);
     transform: translateY(-2px);
@@ -297,18 +304,22 @@ function onDblClick() {
   font-weight: 700;
   z-index: 2;
 }
+
 .card__corner--top {
   top: 4px;
   left: 5px;
 }
+
 .card__corner--bottom {
   bottom: 4px;
   right: 5px;
   transform: rotate(180deg);
 }
+
 .card__rank {
   font-size: 13px;
 }
+
 .card__suit {
   font-size: 11px;
 }
@@ -325,12 +336,12 @@ function onDblClick() {
 }
 
 .card__pip {
-	position: absolute;
-	font-size: 28px;
-	line-height: 1;
-	user-select: none;
-	color: #1a1a1a;
-	transition: transform 0.15s ease;
+  position: absolute;
+  font-size: 28px;
+  line-height: 1;
+  user-select: none;
+  color: #1a1a1a;
+  transition: transform 0.15s ease, font-size 0.15s ease;
 }
 
 /* Ace : un seul grand symbole central */
@@ -341,13 +352,107 @@ function onDblClick() {
 
 /* Ajustement fin de la taille pour la lisibilité sur 7-10 */
 .card__pips--rank-7 .card__pip,
-.card__pips--rank-8 .card__pip {
-  font-size: 28px;
-}
-
+.card__pips--rank-8 .card__pip,
 .card__pips--rank-9 .card__pip,
 .card__pips--rank-10 .card__pip {
   font-size: 28px;
+}
+
+/* Adaptations de la taille de police font-size selon la largeur d'écran (Responsive) */
+@media (max-width: 1100px) {
+  .card__pips {
+    top: 12px;
+    bottom: 12px;
+    left: 10px;
+    right: 10px;
+  }
+
+  .card__pip {
+    font-size: 18px;
+  }
+
+  .card__pip--ace {
+    font-size: 22px;
+  }
+
+  .card__pips--rank-7 .card__pip,
+  .card__pips--rank-8 .card__pip,
+  .card__pips--rank-9 .card__pip,
+  .card__pips--rank-10 .card__pip {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 900px) {
+  .card__pips {
+    top: 10px;
+    bottom: 10px;
+    left: 8px;
+    right: 8px;
+  }
+
+  .card__pip {
+    font-size: 15px;
+  }
+
+  .card__pip--ace {
+    font-size: 18px;
+  }
+
+  .card__pips--rank-7 .card__pip,
+  .card__pips--rank-8 .card__pip,
+  .card__pips--rank-9 .card__pip,
+  .card__pips--rank-10 .card__pip {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 700px) {
+  .card__pips {
+    top: 8px;
+    bottom: 8px;
+    left: 6px;
+    right: 6px;
+  }
+
+  .card__pip {
+    font-size: 12px;
+  }
+
+  .card__pip--ace {
+    font-size: 15px;
+  }
+
+  .card__pips--rank-7 .card__pip,
+  .card__pips--rank-8 .card__pip,
+  .card__pips--rank-9 .card__pip,
+  .card__pips--rank-10 .card__pip {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card__pips {
+    top: 6px;
+    bottom: 6px;
+    left: 4px;
+    right: 4px;
+  }
+
+  .card__pip {
+    font-size: 10px;
+  }
+
+  .card__pip--ace {
+    font-size: 13px;
+  }
+
+  .card__pips--rank-7 .card__pip,
+  .card__pips--rank-8 .card__pip,
+  .card__pips--rank-9 .card__pip,
+  .card__pips--rank-10 .card__pip {
+    font-size: 8px;
+  }
 }
 
 /* Figures (J, Q, K) */

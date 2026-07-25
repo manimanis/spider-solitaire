@@ -16,7 +16,8 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
@@ -44,7 +45,7 @@ body.dark-theme {
   :root {
     --card-width: 68px;
     --card-height: 95px;
-    --card-overlap: 24px;
+    --card-overlap: 20px;
   }
 }
 
@@ -52,7 +53,7 @@ body.dark-theme {
   :root {
     --card-width: 58px;
     --card-height: 82px;
-    --card-overlap: 20px;
+    --card-overlap: 16px;
   }
 }
 
@@ -60,7 +61,15 @@ body.dark-theme {
   :root {
     --card-width: 48px;
     --card-height: 68px;
-    --card-overlap: 16px;
+    --card-overlap: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --card-width: 40px;
+    --card-height: 56px;
+    --card-overlap: 14px;
   }
 }
 
@@ -69,19 +78,24 @@ body.dark-theme {
   width: 10px;
   height: 10px;
 }
+
 ::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.2);
 }
+
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 5px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.35);
 }
 
 /* Empêche la sélection de texte pendant le drag */
-.card, .column, .deck__stack {
+.card,
+.column,
+.deck__stack {
   -webkit-user-select: none;
   user-select: none;
 }

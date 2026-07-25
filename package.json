@@ -1,6 +1,6 @@
 {
   "name": "spider-solitaire",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Spider Solitaire (1 couleur) - Vue 3 + Vite",
   "type": "module",
   "scripts": {

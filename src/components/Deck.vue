@@ -158,4 +158,39 @@ function onClick() {
   font-size: 10px;
   opacity: 0.6;
 }
+
+/* Adaptation sur faible hauteur d'écran */
+@media (max-height: 700px) {
+  .deck {
+    gap: 3px;
+  }
+
+  .deck__label {
+    display: none; /* Masque "Paquet" pour compacter la hauteur */
+  }
+
+  .deck__count {
+    font-size: 10px;
+  }
+
+  .deck__cards-count {
+    font-size: 9px;
+  }
+}
+
+@media (max-height: 550px) {
+  .deck {
+    flex-direction: row; /* Aligne le stock et le texte horizontalement */
+    align-items: center;
+    gap: 8px;
+  }
+
+  .deck__info {
+    text-align: left;
+  }
+
+  .deck__cards-count {
+    display: none;
+  }
+}
 </style>

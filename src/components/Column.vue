@@ -24,10 +24,11 @@ const props = defineProps({
   columnIndex: { type: Number, required: true },
   cards: { type: Array, required: true },
   draggingFrom: { type: Object, default: null },
-  highlightHint: { type: Object, default: null }
+  highlightHint: { type: Object, default: null },
+  selectedCard: { type: Object, default: null }
 })
 
-const emit = defineEmits(['card-drag-start', 'card-drag-end', 'drop', 'card-dblclick'])
+const emit = defineEmits(['card-drag-start', 'card-drag-end', 'drop', 'card-dblclick', 'card-click', 'column-click'])
 
 // Indique si cette colonne est actuellement survolée par un drag valide
 const isDragOver = ref(false)
@@ -44,6 +45,14 @@ const draggingCardIndices = computed(() => {
 const hintedCardIndices = computed(() => {
   if (!props.highlightHint || props.highlightHint.col !== props.columnIndex) return new Set()
   const start = props.highlightHint.index
+  const end = props.cards.length
+  return new Set(Array.from({ length: end - start }, (_, i) => start + i))
+})
+
+// Indices des cartes sélectionnées par clic (tap-to-select)
+const selectedCardIndices = computed(() => {
+  if (!props.selectedCard || props.selectedCard.col !== props.columnIndex) return new Set()
+  const start = props.selectedCard.index
   const end = props.cards.length
   return new Set(Array.from({ length: end - start }, (_, i) => start + i))
 })
@@ -96,6 +105,14 @@ function onDrop(event) {
 function onCardDblClick(cardIndex) {
   emit('card-dblclick', props.columnIndex, cardIndex)
 }
+
+function onCardClick(cardIndex) {
+  emit('card-click', props.columnIndex, cardIndex)
+}
+
+function onColumnClick() {
+  emit('column-click', props.columnIndex)
+}
 </script>
 
 <template>
@@ -105,6 +122,7 @@ function onCardDblClick(cardIndex) {
     @dragover="onDragOver"
     @dragleave="onDragLeave"
     @drop="onDrop"
+    @click="onColumnClick"
   >
     <!-- Emplacement vide : indique où déposer -->
     <div v-if="cards.length === 0" class="column__placeholder">
@@ -116,7 +134,7 @@ function onCardDblClick(cardIndex) {
       v-for="(card, index) in cards"
       :key="card.id"
       class="column__card-wrapper"
-      :style="{ top: `${index * 28}px`, zIndex: index + 1 }"
+      :style="{ top: `calc(${index} * var(--card-overlap, 28px))`, zIndex: index + 1 }"
     >
       <Card
         :card="card"
@@ -125,8 +143,10 @@ function onCardDblClick(cardIndex) {
         :is-draggable="isCardDraggable(index)"
         :is-dragging="draggingCardIndices.has(index)"
         :is-hinted="hintedCardIndices.has(index)"
+        :is-selected="selectedCardIndices.has(index)"
         @drag-start="onDragStart"
         @drag-end="onDragEnd"
+        @click="onCardClick(index)"
         @dblclick="onCardDblClick"
       />
     </div>

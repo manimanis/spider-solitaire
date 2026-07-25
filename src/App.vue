@@ -54,6 +54,13 @@ onMounted(() => {
   applyTheme()
   window.addEventListener('keydown', onKeyDown)
   window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
+
+  // Verrouillage en mode paysage si supporté par l'appareil/navigateur
+  if (window.screen && window.screen.orientation && window.screen.orientation.lock) {
+    window.screen.orientation.lock('landscape').catch(() => {
+      // Ignoré si le navigateur nécessite le plein écran ou une interaction
+    })
+  }
 })
 
 onUnmounted(() => {
@@ -317,6 +324,17 @@ game.newGame = function() {
       <span>Espace: Distribuer</span>
       <span>H: Indice</span>
     </div>
+
+    <!-- Invitation à tourner l'appareil en mode paysage sur smartphone -->
+    <div class="portrait-warning-overlay">
+      <div class="portrait-warning">
+        <div class="portrait-warning__icon">🔄</div>
+        <div class="portrait-warning__title">Mode Paysage Recommandé</div>
+        <div class="portrait-warning__text">
+          Tournez votre smartphone à l'horizontale pour profiter de la meilleure expérience de jeu.
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -509,6 +527,8 @@ game.newGame = function() {
   justify-content: center;
   z-index: 1000;
   animation: fadeIn 0.4s ease;
+  padding: 16px;
+  box-sizing: border-box;
 }
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -523,6 +543,10 @@ game.newGame = function() {
   text-align: center;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(255, 215, 0, 0.3);
   animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-height: 90vh;
+  max-width: 90vw;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 @keyframes popIn {
   from { transform: scale(0.5); opacity: 0; }
@@ -637,6 +661,190 @@ game.newGame = function() {
   .btn {
     padding: 6px 10px;
     font-size: 12px;
+  }
+}
+
+/* Réduction maximale de l'en-tête lorsque la hauteur de l'écran est faible */
+@media (max-height: 700px) {
+  .app__header {
+    padding: 8px 16px;
+    gap: 8px 12px;
+  }
+  .app__title {
+    font-size: 16px;
+    gap: 6px;
+  }
+  .app__title-icon {
+    font-size: 18px;
+  }
+  .app__subtitle {
+    display: none; /* Masque le sous-titre pour libérer de la hauteur */
+  }
+  .app__stats {
+    gap: 12px;
+  }
+  .stat {
+    min-width: auto;
+  }
+  .stat__label {
+    font-size: 9px;
+  }
+  .stat__value {
+    font-size: 14px;
+  }
+  .btn {
+    padding: 5px 10px;
+    font-size: 12px;
+    gap: 4px;
+  }
+  .btn__icon {
+    font-size: 13px;
+  }
+
+  /* Modale de victoire responsive */
+  .victory-modal {
+    padding: 20px 28px;
+    border-radius: 12px;
+  }
+  .victory-modal__icon {
+    font-size: 40px;
+    margin-bottom: 6px;
+  }
+  .victory-modal__title {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+  .victory-modal__text {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .victory-modal__stats {
+    font-size: 14px;
+    margin-bottom: 14px;
+    gap: 4px;
+  }
+}
+
+@media (max-height: 550px) {
+  .app__header {
+    padding: 4px 12px;
+    gap: 4px 10px;
+  }
+  .app__title {
+    font-size: 14px;
+    gap: 4px;
+  }
+  .app__title-icon {
+    font-size: 16px;
+  }
+  .app__stats {
+    gap: 8px;
+  }
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .stat__label {
+    font-size: 9px;
+  }
+  .stat__label::after {
+    content: ':';
+  }
+  .stat__value {
+    font-size: 12px;
+  }
+  .btn {
+    padding: 3px 8px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+  .btn__icon {
+    font-size: 12px;
+  }
+  .progress-bar {
+    height: 2px;
+  }
+  .keyboard-hint {
+    display: none; /* Masque le bandeau de raccourcis bas pour préserver l'espace de jeu */
+  }
+
+  /* Modale de victoire ultra-compacte */
+  .victory-modal {
+    padding: 12px 20px;
+    border-radius: 10px;
+  }
+  .victory-modal__icon {
+    font-size: 28px;
+    margin-bottom: 2px;
+  }
+  .victory-modal__title {
+    font-size: 20px;
+    margin-bottom: 2px;
+  }
+  .victory-modal__text {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  .victory-modal__stats {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+}
+
+/* Avertissement mode portrait sur smartphone */
+.portrait-warning-overlay {
+  display: none;
+}
+
+@media screen and (orientation: portrait) and (max-width: 768px) {
+  .portrait-warning-overlay {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 31, 23, 0.96);
+    backdrop-filter: blur(12px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .portrait-warning {
+    background: linear-gradient(145deg, #1a3a2a 0%, #1a1a2e 100%);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 16px;
+    padding: 28px 24px;
+    max-width: 320px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  }
+
+  .portrait-warning__icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    animation: rotateHint 2.5s infinite ease-in-out;
+  }
+
+  .portrait-warning__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffd700;
+    margin-bottom: 8px;
+  }
+
+  .portrait-warning__text {
+    font-size: 13px;
+    opacity: 0.85;
+    line-height: 1.4;
+  }
+
+  @keyframes rotateHint {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(90deg); }
   }
 }
 </style>

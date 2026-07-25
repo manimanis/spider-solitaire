@@ -16,7 +16,7 @@ export default defineConfig({
         theme_color: '#0f0f18',
         background_color: '#0f0f18',
         display: 'standalone',
-        orientation: 'any',
+        orientation: 'landscape',
         start_url: './',
         scope: './',
         icons: [
@@ -45,6 +45,9 @@ export default defineConfig({
         ]
       },
       workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']
       }
     })
