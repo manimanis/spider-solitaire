@@ -16,25 +16,29 @@ export default defineConfig({
         theme_color: '#0f0f18',
         background_color: '#0f0f18',
         display: 'standalone',
-        orientation: 'landscape',
-        start_url: './',
+        orientation: 'any',
+        start_url: './index.html',
         scope: './',
+        id: './',
+        lang: 'fr',
         icons: [
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           },
           {
             src: 'maskable-icon-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'maskable'
           },
           {
             src: 'icon.svg',
@@ -48,6 +52,7 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
+        navigateFallback: 'index.html',
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']
       }
     })
